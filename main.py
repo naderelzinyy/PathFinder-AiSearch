@@ -20,7 +20,7 @@ class Game:
 
     def load_data(self):
         self.map_data = []
-        with open(path.join(path.dirname(__file__), 'map2.txt'), 'rt') as f:
+        with open(path.join(path.dirname(__file__), 'map3.txt'), 'rt') as f:
             for line in f:
                 self.map_data.append(line)
 
@@ -77,9 +77,9 @@ class Game:
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+            pg.draw.line(self.screen, BLACK, (x, 0), (x, HEIGHT))
         for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
+            pg.draw.line(self.screen, BLACK, (0, y), (WIDTH, y))
 
     def draw_search_surface(self, ia: IA):
         for pos in ia.path:
@@ -118,8 +118,8 @@ class Game:
             goal = ia.goal
             self.draw_path(start, goal, ia.path)
         self.all_sprites.draw(self.screen)
-        draw_text("a_star_search", 30, BLUE, WIDTH - 10, HEIGHT - 10, self.screen, self.font_name, align="bottomright")
-        draw_text(f"Path length:{self.path_len}", 30, BLUE, WIDTH - 10, HEIGHT - 45, self.screen, self.font_name, align="bottomright")
+        draw_text("A* Search", 30, WHITE, WIDTH - 10, HEIGHT - 10, self.screen, self.font_name, align="bottomright")
+        draw_text(f"Path length:{self.path_len}", 30, WHITE, WIDTH - 10, HEIGHT - 45, self.screen, self.font_name, align="bottomright")
         pg.display.flip()
 
     def events(self):

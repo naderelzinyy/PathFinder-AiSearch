@@ -2,20 +2,20 @@
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 DARKGREY = (40, 40, 40)
-LIGHTGREY = (100, 100, 100)
-GREEN = (128, 0, 128)
+LIGHTGREY = (100, 100, 100)  # grid
+DARKPURPLE = (100, 0, 100)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-YELLOW = (255, 255, 250)
+GREEN = (0, 255, 0)
 FOREST = (34, 57, 10)
 CYAN = (0, 255, 255)
 MAGENTA = (255, 0, 255)
 DARKGRAY = (40, 40, 40)
 MEDGRAY = (75, 75, 75)
-LIGHTGRAY = (140, 140, 140)
+LIGHTGRAY = (140, 140, 140)  # DRAWING PATH
 
 # game settings
-WIDTH = 1024   # 16 * 64 or 32 * 32 or 64 * 16
+WIDTH = 1024  # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 768  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 60
 TITLE = "Our game"
@@ -27,4 +27,3 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
 PLAYER_SPEED = 300
-
