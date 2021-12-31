@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
     goal = vec(14, 8)
     start = vec(20, 0)
-    search_type = a_star_search
+    search_type = dijkstra_search
     path, c = search_type(g, goal, start)
 
     running = True
