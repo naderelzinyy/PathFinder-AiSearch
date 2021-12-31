@@ -1,3 +1,6 @@
 # Default ignored files
 /shelf/
 .idea
+__pycache__/pathfinding.cpython-39.pyc
+__pycache__/settings.cpython-39.pyc
+__pycache__/sprites.cpython-39.pyc
