@@ -1,4 +1,3 @@
-
 import pygame as pg
 from os import path
 import heapq
@@ -11,6 +10,7 @@ def draw_text(text, size, color, x, y, screen, font_name, align="topleft"):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(**{align: (x, y)})
     screen.blit(text_surface, text_rect)
+
 
 class SquareGrid:
     def __init__(self, width, height):
@@ -37,6 +37,7 @@ class SquareGrid:
         for wall in self.walls:
             rect = pg.Rect(wall * TILESIZE, (TILESIZE, TILESIZE))
             pg.draw.rect(screen, LIGHTGRAY, rect)
+
 
 class WeightedGrid(SquareGrid):
     def __init__(self, width, height):
@@ -71,11 +72,13 @@ class PriorityQueue:
     def empty(self):
         return len(self.nodes) == 0
 
+
 def draw_grid():
-    SIZE=WIDTH+HEIGHT
+    SIZE = WIDTH + HEIGHT
     for i in range(0, SIZE, TILESIZE):
         pg.draw.line(screen, CYAN, (i, 0), (i, SIZE))
         pg.draw.line(screen, CYAN, (0, i), (SIZE, i))
+
 
 def draw_icons():
     start_center = (goal.x * TILESIZE + TILESIZE / 2, goal.y * TILESIZE + TILESIZE / 2)
@@ -83,12 +86,15 @@ def draw_icons():
     goal_center = (start.x * TILESIZE + TILESIZE / 2, start.y * TILESIZE + TILESIZE / 2)
     screen.blit(cross_img, cross_img.get_rect(center=goal_center))
 
+
 def vec2int(v):
     return (int(v.x), int(v.y))
+
 
 def heuristic(a, b):
     # return abs(a.x - b.x) ** 2 + abs(a.y - b.y) ** 2
     return (abs(a.x - b.x) + abs(a.y - b.y)) * 10
+
 
 def a_star_search(graph, start, end):
     frontier = PriorityQueue()
@@ -112,6 +118,7 @@ def a_star_search(graph, start, end):
                 path[next] = vec(current) - vec(next)
     return path, cost
 
+
 def dijkstra_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
@@ -133,7 +140,9 @@ def dijkstra_search(graph, start, end):
                 # priority = heuristic(end, vec(next))
                 frontier.put(next, priority)
                 path[next] = vec(current) - vec(next)
+
     return path, cost
+
 
 if __name__ == '__main__':
     TILESIZE = 48
@@ -173,11 +182,21 @@ if __name__ == '__main__':
         arrows[dir] = pg.transform.rotate(arrow_img, vec(dir).angle_to(vec(1, 0)))
 
     g = WeightedGrid(GRIDWIDTH, GRIDHEIGHT)
-    walls = [(10, 7), (11, 7), (12, 7), (13, 7), (14, 7), (15, 7), (16, 7), (7, 7), (6, 7), (5, 7), (5, 5), (5, 6), (1, 6), (2, 6), (3, 6), (5, 10), (5, 11), (5, 12), (5, 9), (5, 8), (12, 8), (12, 9), (12, 10), (12, 11), (15, 14), (15, 13), (15, 12), (15, 11), (15, 10), (17, 7), (18, 7), (21, 7), (21, 6), (21, 5), (21, 4), (21, 3), (22, 5), (23, 5), (24, 5), (25, 5), (18, 10), (20, 10), (19, 10), (21, 10), (22, 10), (23, 10), (14, 4), (14, 5), (14, 6), (14, 0), (14, 1), (9, 2), (9, 1), (7, 3), (8, 3), (10, 3), (9, 3), (11, 3), (2, 5), (2, 4), (2, 3), (2, 2), (2, 0), (2, 1), (0, 11), (1, 11), (2, 11), (21, 2), (20, 11), (20, 12), (23, 13), (23, 14), (24, 10), (25, 10), (6, 12), (7, 12), (10, 12), (11, 12), (12, 12), (5, 3), (6, 3), (5, 4)]
+    walls = [(10, 7), (11, 7), (12, 7), (13, 7), (14, 7), (15, 7), (16, 7), (7, 7), (6, 7), (5, 7), (5, 5), (5, 6),
+             (1, 6), (2, 6), (3, 6), (5, 10), (5, 11), (5, 12), (5, 9), (5, 8), (12, 8), (12, 9), (12, 10), (12, 11),
+             (15, 14), (15, 13), (15, 12), (15, 11), (15, 10), (17, 7), (18, 7), (21, 7), (21, 6), (21, 5), (21, 4),
+             (21, 3), (22, 5), (23, 5), (24, 5), (25, 5), (18, 10), (20, 10), (19, 10), (21, 10), (22, 10), (23, 10),
+             (14, 4), (14, 5), (14, 6), (14, 0), (14, 1), (9, 2), (9, 1), (7, 3), (8, 3), (10, 3), (9, 3), (11, 3),
+             (2, 5), (2, 4), (2, 3), (2, 2), (2, 0), (2, 1), (0, 11), (1, 11), (2, 11), (21, 2), (20, 11), (20, 12),
+             (23, 13), (23, 14), (24, 10), (25, 10), (6, 12), (7, 12), (10, 12), (11, 12), (12, 12), (5, 3), (6, 3),
+             (5, 4)]
     # walls = []
     for wall in walls:
         g.walls.append(vec(wall))
-    terrain = [(11, 6), (12, 6), (13, 6), (14, 6), (15, 6), (10, 7), (11, 7), (12, 7), (13, 7), (14, 7), (15, 7), (16, 7), (16, 8), (15, 8), (14, 8), (13, 8), (12, 8), (11, 8), (10, 8), (11, 9), (12, 9), (13, 9), (14, 9), (15, 9), (11, 10), (12, 10), (13, 10), (14, 10), (15, 10), (12, 11), (13, 11), (14, 11), (12, 5), (13, 5), (14, 5), (11, 5), (15, 5), (12, 4), (13, 4), (14, 4)]
+    terrain = [(11, 6), (12, 6), (13, 6), (14, 6), (15, 6), (10, 7), (11, 7), (12, 7), (13, 7), (14, 7), (15, 7),
+               (16, 7), (16, 8), (15, 8), (14, 8), (13, 8), (12, 8), (11, 8), (10, 8), (11, 9), (12, 9), (13, 9),
+               (14, 9), (15, 9), (11, 10), (12, 10), (13, 10), (14, 10), (15, 10), (12, 11), (13, 11), (14, 11),
+               (12, 5), (13, 5), (14, 5), (11, 5), (15, 5), (12, 4), (13, 4), (14, 4)]
     terrain = []
     for tile in terrain:
         g.weights[tile] = 15
@@ -211,8 +230,12 @@ if __name__ == '__main__':
                     if mpos in g.walls:
                         g.walls.remove(mpos)
                     else:
-                        g.walls.append(mpos)
+                        if mpos != start :
+                            g.walls.append(mpos)
+
                 if event.button == 1:
+                    if mpos in g.walls:
+                        break
                     start = mpos
                 if event.button == 3:
                     goal = mpos
@@ -229,7 +252,7 @@ if __name__ == '__main__':
         draw_grid()
         g.draw()
         # draw path from start to goal
-        current = start # + path[vec2int(start)]
+        current = start  # + path[vec2int(start)]
         l = 0
         while current != goal:
             v = path[(current.x, current.y)]
@@ -246,5 +269,6 @@ if __name__ == '__main__':
             current = current + path[vec2int(current)]
         draw_icons()
         draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
-        draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
+        draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name,
+                  align="bottomright")
         pg.display.flip()
