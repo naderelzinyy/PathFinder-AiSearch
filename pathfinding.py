@@ -189,66 +189,69 @@ if __name__ == '__main__':
 
     running = True
     while running:
-        clock.tick(FPS)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+            clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
                     running = False
-                if event.key == pg.K_SPACE:
-                    if search_type == a_star_search:
-                        search_type = dijkstra_search
-                    else:
-                        search_type = a_star_search
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        running = False
+                    if event.key == pg.K_SPACE:
+                        if search_type == a_star_search:
+                            search_type = dijkstra_search
+                        else:
+                            search_type = a_star_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_m:
+                        # dump the wall list for saving
+                        print([(int(loc.x), int(loc.y)) for loc in g.walls])
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    mpos = vec(pg.mouse.get_pos()) // TILESIZE
+                    if event.button == 2:
+                        if mpos in g.walls:
+                            g.walls.remove(mpos)
+                        else:
+                            if mpos != start :
+                                g.walls.append(mpos)
+                    if event.button == 1:
+                        if mpos in g.walls:
+                            break
+                        start = mpos
+                    if event.button == 3:
+                        goal = mpos
                     path, c = search_type(g, goal, start)
-                if event.key == pg.K_m:
-                    # dump the wall list for saving
-                    print([(int(loc.x), int(loc.y)) for loc in g.walls])
-            if event.type == pg.MOUSEBUTTONDOWN:
-                mpos = vec(pg.mouse.get_pos()) // TILESIZE
-                if event.button == 2:
-                    if mpos in g.walls:
-                        g.walls.remove(mpos)
-                    else:
-                        if mpos != start:
-                            g.walls.append(mpos)
-                if event.button == 1:
-                    if mpos in g.walls :
-                        break
-                    start = mpos
-                if event.button == 3:
-                    goal = mpos
-                path, c = search_type(g, goal, start)
 
-        # pg.display.set_caption("{:.2f}".format(clock.get_fps()))
-        pg.display.set_caption("Path Finder")
-        screen.fill(BLACK)
-        # fill explored area
-        for node in path:
-            x, y = node
-            rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-            pg.draw.rect(screen, MEDGRAY, rect)
-        draw_grid()
-        g.draw()
-        # draw path from start to goal
-        current = start # + path[vec2int(start)]
-        l = 0
-        while current != goal:
-            v = path[(current.x, current.y)]
-            if v.length_squared() == 1:
-                l += 10
-            else:
-                l += 14
-            img = arrows[vec2int(v)]
-            x = current.x * TILESIZE + TILESIZE / 2
-            y = current.y * TILESIZE + TILESIZE / 2
-            r = img.get_rect(center=(x, y))
-            screen.blit(img, r)
-            # find next in path
-            current = current + path[vec2int(current)]
-        draw_icons()
-        draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
-        draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
-        pg.display.flip()
-        #test
+            # pg.display.set_caption("{:.2f}".format(clock.get_fps()))
+            pg.display.set_caption("Path Finder")
+            screen.fill(BLACK)
+            # fill explored area
+            for node in path:
+                x, y = node
+                rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+                pg.draw.rect(screen, MEDGRAY, rect)
+            draw_grid()
+            g.draw()
+            # draw path from start to goal
+            current = start # + path[vec2int(start)]
+            l = 0
+            try:
+                while current != goal:
+                    if (current.x, current.y) in path:
+                        v = path[(current.x, current.y)]
+                    if v.length_squared() == 1:
+                        l += 10
+                    else:
+                        l += 14
+                    img = arrows[vec2int(v)]
+                    x = current.x * TILESIZE + TILESIZE / 2
+                    y = current.y * TILESIZE + TILESIZE / 2
+                    r = img.get_rect(center=(x, y))
+                    screen.blit(img, r)
+                    # find next in path
+                    current = current + path[vec2int(current)]
+            except :
+                pass
+            draw_icons()
+            draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
+            draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
+            pg.display.flip()
