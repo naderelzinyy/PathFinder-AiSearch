@@ -52,7 +52,7 @@ class WeightedGrid(SquareGrid):
     def draw(self):
         for wall in self.walls:
             rect = pg.Rect(wall * TILESIZE, (TILESIZE, TILESIZE))
-            pg.draw.rect(screen, LIGHTGRAY, rect)
+            pg.draw.rect(screen, DARKPURPLE, rect)
         for tile in self.weights:
             x, y = tile
             rect = pg.Rect(x * TILESIZE + 3, y * TILESIZE + 3, TILESIZE - 3, TILESIZE - 3)
@@ -72,10 +72,10 @@ class PriorityQueue:
         return len(self.nodes) == 0
 
 def draw_grid():
-    for x in range(0, WIDTH, TILESIZE):
-        pg.draw.line(screen, LIGHTGRAY, (x, 0), (x, HEIGHT))
-    for y in range(0, HEIGHT, TILESIZE):
-        pg.draw.line(screen, LIGHTGRAY, (0, y), (WIDTH, y))
+    SIZE=WIDTH+HEIGHT
+    for i in range(0, SIZE, TILESIZE):
+        pg.draw.line(screen, CYAN, (i, 0), (i, SIZE))
+        pg.draw.line(screen, CYAN, (0, i), (SIZE, i))
 
 def draw_icons():
     start_center = (goal.x * TILESIZE + TILESIZE / 2, goal.y * TILESIZE + TILESIZE / 2)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     GRIDHEIGHT = 15
     WIDTH = TILESIZE * GRIDWIDTH
     HEIGHT = TILESIZE * GRIDHEIGHT
-    FPS = 60
+    FPS = 144
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
@@ -151,8 +151,8 @@ if __name__ == '__main__':
     MAGENTA = (255, 0, 255)
     YELLOW = (255, 255, 0)
     DARKGRAY = (40, 40, 40)
+    DARKPURPLE = (100, 0, 100)
     MEDGRAY = (75, 75, 75)
-    LIGHTGRAY = (140, 140, 140)
 
     pg.init()
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -160,12 +160,12 @@ if __name__ == '__main__':
     font_name = pg.font.match_font('hack')
 
     icon_dir = path.join(path.dirname(__file__))
-    home_img = pg.image.load(path.join(icon_dir, 'home.png')).convert_alpha()
+    home_img = pg.image.load(path.join(icon_dir, 'goal.png')).convert_alpha()
     home_img = pg.transform.scale(home_img, (50, 50))
-    home_img.fill((0, 255, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
-    cross_img = pg.image.load(path.join(icon_dir, 'cross.png')).convert_alpha()
+    # home_img.fill((0, 255, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
+    cross_img = pg.image.load(path.join(icon_dir, 'ball.png'))
     cross_img = pg.transform.scale(cross_img, (50, 50))
-    cross_img.fill((255, 0, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
+    # cross_img.fill((255, 0, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
     arrows = {}
     arrow_img = pg.image.load(path.join(icon_dir, 'arrowRight.png')).convert_alpha()
     arrow_img = pg.transform.scale(arrow_img, (50, 50))
@@ -218,8 +218,9 @@ if __name__ == '__main__':
                     goal = mpos
                 path, c = search_type(g, goal, start)
 
-        pg.display.set_caption("{:.2f}".format(clock.get_fps()))
-        screen.fill(DARKGRAY)
+        # pg.display.set_caption("{:.2f}".format(clock.get_fps()))
+        pg.display.set_caption("Path Finder")
+        screen.fill(BLACK)
         # fill explored area
         for node in path:
             x, y = node
@@ -244,6 +245,6 @@ if __name__ == '__main__':
             # find next in path
             current = current + path[vec2int(current)]
         draw_icons()
-        draw_text(search_type.__name__, 30, GREEN, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
-        draw_text('Path length:{}'.format(l), 30, GREEN, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
+        draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
+        draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
         pg.display.flip()
