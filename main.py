@@ -66,6 +66,9 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            if self.path_len == 0:
+                draw_text("You've been caught newbie", 30, WHITE, 20, 35, self.screen, self.font_name, align="topleft")
+
 
     def quit(self):
         pg.quit()
@@ -118,8 +121,10 @@ class Game:
             goal = ia.goal
             self.draw_path(start, goal, ia.path)
         self.all_sprites.draw(self.screen)
-        draw_text("A* Search", 30, WHITE, WIDTH - 10, HEIGHT - 10, self.screen, self.font_name, align="bottomright")
-        draw_text(f"Path length:{self.path_len}", 30, WHITE, WIDTH - 10, HEIGHT - 45, self.screen, self.font_name, align="bottomright")
+        draw_text("A* Search", 30, WHITE, 10,  10, self.screen, self.font_name, align="topleft")
+        draw_text(f"Path length:{self.path_len}", 30, WHITE, 10,  45, self.screen, self.font_name, align="topleft")
+        if self.path_len == 0:
+            draw_text("Caught", 100, WHITE, 475, 200, self.screen, self.font_name, align="topleft")
         pg.display.flip()
 
     def events(self):
@@ -131,10 +136,14 @@ class Game:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
 
+
+
 if __name__ == '__main__':
-    # create the game object
+    # create the game object test
     g = Game()
-    while True:
-        g.new()
-        g.run()
+    g.new()
+    g.run()
+
+
+
 
