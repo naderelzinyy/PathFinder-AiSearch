@@ -211,8 +211,11 @@ if __name__ == '__main__':
                     if mpos in g.walls:
                         g.walls.remove(mpos)
                     else:
-                        g.walls.append(mpos)
+                        if mpos != start:
+                           g.walls.append(mpos)
                 if event.button == 1:
+                    if mpos in g.walls:
+                        break
                     start = mpos
                 if event.button == 3:
                     goal = mpos
