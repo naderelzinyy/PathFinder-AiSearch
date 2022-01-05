@@ -2,21 +2,30 @@
 import pygame as pg
 import sys
 from os import path
+from menu import *
 from settings import *
 from sprites import *
+from pathfinding import *
 
 vec = pg.math.Vector2
+
 
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.window = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         pg.key.set_repeat(500, 100)
         self.load_data()
-
+        self.playing = False
+        self.running = True
+        self.display = pg.Surface((WIDTH, HEIGHT))
+        self.font_name = pg.font.get_default_font()
+        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
         self.path_len = 0
+        self.main_menu = MainMenu(self)
+        self.curr_menu = self.main_menu
 
     def load_data(self):
         self.map_data = []
@@ -59,30 +68,27 @@ class Game:
         print(f"walls_list : {self.walls_list}")
 
     def run(self):
-        # game loop - set self.playing = False to end the game
+
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
-            if self.path_len == 0:
-                draw_text("You've been caught newbie", 30, WHITE, 20, 35, self.screen, self.font_name, align="topleft")
-
 
     def quit(self):
+        self.running = self.playing = False
         pg.quit()
-        sys.exit()
 
     def update(self):
-        # update portion of the game loop
+
         self.all_sprites.update()
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, BLACK, (x, 0), (x, HEIGHT))
+            pg.draw.line(self.window, BLACK, (x, 0), (x, HEIGHT))
         for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, BLACK, (0, y), (WIDTH, y))
+            pg.draw.line(self.window, BLACK, (0, y), (WIDTH, y))
 
     def draw_search_surface(self, ia: IA):
         for pos in ia.path:
@@ -92,11 +98,12 @@ class Game:
             img = pg.Surface((TILESIZE, TILESIZE))
             img.fill(LIGHTGRAY)
             rect = img.get_rect(topleft=(x, y))
-            self.screen.blit(img, rect)
+            self.window.blit(img, rect)
 
     def draw_path(self, start: pg.math.Vector2, goal: pg.math.Vector2, path: {(int, int): pg.math.Vector2}):
         current = start
         path_len = 0
+        # try:
         while current != goal:
             v = path[(current.x, current.y)]
             if v.length_squared() == 1:
@@ -107,24 +114,26 @@ class Game:
             x = current.x * TILESIZE + TILESIZE / 2
             y = current.y * TILESIZE + TILESIZE / 2
             rect = img.get_rect(center=(x, y))
-            self.screen.blit(img, rect)
+            self.window.blit(img, rect)
             # find next in path
             current = current + path[vec2int(current)]
+        # except:
+        #     pass
         self.path_len = path_len
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
+        self.window.fill(BGCOLOR)
         self.draw_grid()
         for ia in self.ias:
             self.draw_search_surface(ia)
             start = vec(ia.x // TILESIZE, ia.y // TILESIZE)
             goal = ia.goal
             self.draw_path(start, goal, ia.path)
-        self.all_sprites.draw(self.screen)
-        draw_text("A* Search", 30, WHITE, 10,  10, self.screen, self.font_name, align="topleft")
-        draw_text(f"Path length:{self.path_len}", 30, WHITE, 10,  45, self.screen, self.font_name, align="topleft")
+        self.all_sprites.draw(self.window)
+        draw_text("A* Search", 30, WHITE, 10,  10, self.window, self.font_name, align="topleft")
+        draw_text(f"Path length:{self.path_len}", 30, WHITE, 10,  45, self.window, self.font_name, align="topleft")
         if self.path_len == 0:
-            draw_text("Caught", 100, WHITE, 390, 200, self.screen, self.font_name, align="topleft")
+            draw_text("Caught", 100, WHITE, 390, 200, self.window, self.font_name, align="topleft")
         pg.display.flip()
 
     def events(self):
@@ -136,14 +145,42 @@ class Game:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
 
+    def check_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.running, self.playing = False, False
+                self.curr_menu.run_display = False
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    self.START_KEY = True
+                if event.key == pg.K_BACKSPACE:
+                    self.BACK_KEY = True
+                if event.key == pg.K_DOWN:
+                    self.DOWN_KEY = True
+                if event.key == pg.K_UP:
+                    self.UP_KEY = True
+
+    def reset_keys(self):
+        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
+
+    def draw_text(self, text, size, x, y):
+        font = pg.font.Font(self.font_name, size)
+        text_surface = font.render(text, True, WHITE)
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x, y)
+        self.window.blit(text_surface, text_rect)
 
 
 if __name__ == '__main__':
     # create the game object test
     g = Game()
-    g.new()
-    g.run()
-
-
-
+    # p = pathSimulator()
+    try:
+        while g.running:
+            g.curr_menu.display_menu()
+            g.new()
+            g.run()
+            # p.path_fider()
+    except:
+        pass
 
