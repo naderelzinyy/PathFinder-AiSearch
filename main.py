@@ -20,14 +20,14 @@ class Game:
 
     def load_data(self):
         self.map_data = []
-        with open(path.join(path.dirname(__file__), 'map3.txt'), 'rt') as f:
+        with open(path.join(path.dirname(__file__), './Maps/map3.txt'), 'rt') as f:
             for line in f:
                 self.map_data.append(line)
 
         # load arrow sprites
         icon_dir = path.join(path.dirname(__file__))
         self.arrows = {}
-        arrow_img = pg.image.load(path.join(icon_dir, 'arrowRight.png')).convert_alpha()
+        arrow_img = pg.image.load(path.join(icon_dir, './Images/arrowRight.png')).convert_alpha()
         arrow_img = pg.transform.scale(arrow_img, (50, 50))
         for dir in [(1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
             self.arrows[dir] = pg.transform.rotate(arrow_img, vec(dir).angle_to(vec(1, 0)))
@@ -124,7 +124,7 @@ class Game:
         draw_text("A* Search", 30, WHITE, 10,  10, self.screen, self.font_name, align="topleft")
         draw_text(f"Path length:{self.path_len}", 30, WHITE, 10,  45, self.screen, self.font_name, align="topleft")
         if self.path_len == 0:
-            draw_text("Caught", 100, WHITE, 475, 200, self.screen, self.font_name, align="topleft")
+            draw_text("Caught", 100, WHITE, 390, 200, self.screen, self.font_name, align="topleft")
         pg.display.flip()
 
     def events(self):

@@ -79,9 +79,9 @@ def draw_grid():
 
 def draw_icons():
     start_center = (goal.x * TILESIZE + TILESIZE / 2, goal.y * TILESIZE + TILESIZE / 2)
-    screen.blit(home_img, home_img.get_rect(center=start_center))
+    screen.blit(ball_img, ball_img.get_rect(center=start_center))
     goal_center = (start.x * TILESIZE + TILESIZE / 2, start.y * TILESIZE + TILESIZE / 2)
-    screen.blit(cross_img, cross_img.get_rect(center=goal_center))
+    screen.blit(goal_img, goal_img.get_rect(center=goal_center))
 
 def vec2int(v):
     return (int(v.x), int(v.y))
@@ -89,6 +89,27 @@ def vec2int(v):
 def heuristic(a, b):
     # return abs(a.x - b.x) ** 2 + abs(a.y - b.y) ** 2
     return (abs(a.x - b.x) + abs(a.y - b.y)) * 10
+
+def breadth_first_search(graph, start, end):
+    frontier = PriorityQueue()
+    frontier.put(vec2int(start), 0)
+    path = {}
+    cost = {}
+    path[vec2int(start)] = None
+    cost[vec2int(start)] = 0
+
+    while not frontier.empty():
+        current = frontier.get()
+        if current == end:
+            break
+        for next in graph.find_neighbors(vec(current)):
+            next = vec2int(next)
+            next_cost = cost[current] + graph.cost(current, next)
+            if next not in cost or next_cost < cost[next]:
+                cost[next] = next_cost
+                frontier.put(next, cost)
+                path[next] = vec(current) - vec(next)
+    return path, cost
 
 def a_star_search(graph, start, end):
     frontier = PriorityQueue()
@@ -112,7 +133,7 @@ def a_star_search(graph, start, end):
                 path[next] = vec(current) - vec(next)
     return path, cost
 
-def dijkstra_search(graph, start, end):
+def greedy_best_first_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
     path = {}
@@ -141,7 +162,7 @@ if __name__ == '__main__':
     GRIDHEIGHT = 15
     WIDTH = TILESIZE * GRIDWIDTH
     HEIGHT = TILESIZE * GRIDHEIGHT
-    FPS = 144
+    FPS = 60
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
@@ -160,14 +181,14 @@ if __name__ == '__main__':
     font_name = pg.font.match_font('hack')
 
     icon_dir = path.join(path.dirname(__file__))
-    home_img = pg.image.load(path.join(icon_dir, 'goal.png')).convert_alpha()
-    home_img = pg.transform.scale(home_img, (50, 50))
+    goal_img = pg.image.load(path.join(icon_dir, './Images/goal.png')).convert_alpha()
+    goal_img = pg.transform.scale(goal_img, (50, 50))
     # home_img.fill((0, 255, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
-    cross_img = pg.image.load(path.join(icon_dir, 'ball.png'))
-    cross_img = pg.transform.scale(cross_img, (50, 50))
+    ball_img = pg.image.load(path.join(icon_dir, './Images/ball.png'))
+    ball_img = pg.transform.scale(ball_img, (50, 50))
     # cross_img.fill((255, 0, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
     arrows = {}
-    arrow_img = pg.image.load(path.join(icon_dir, 'arrowRight.png')).convert_alpha()
+    arrow_img = pg.image.load(path.join(icon_dir, './Images/arrowLeft.png')).convert_alpha()
     arrow_img = pg.transform.scale(arrow_img, (50, 50))
     for dir in [(1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
         arrows[dir] = pg.transform.rotate(arrow_img, vec(dir).angle_to(vec(1, 0)))
@@ -184,71 +205,77 @@ if __name__ == '__main__':
 
     goal = vec(14, 8)
     start = vec(20, 0)
-    search_type = dijkstra_search
+    search_type = a_star_search
     path, c = search_type(g, goal, start)
 
     running = True
     while running:
-        clock.tick(FPS)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+            clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
                     running = False
-                if event.key == pg.K_SPACE:
-                    if search_type == a_star_search:
-                        search_type = dijkstra_search
-                    else:
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        running = False
+                    if event.key == pg.K_1:
                         search_type = a_star_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_2:
+                        search_type = greedy_best_first_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_3:
+                        search_type = breadth_first_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_m:
+                        # dump the wall list for saving
+                        print([(int(loc.x), int(loc.y)) for loc in g.walls])
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    mpos = vec(pg.mouse.get_pos()) // TILESIZE
+                    if event.button == 2:
+                        if mpos in g.walls:
+                            g.walls.remove(mpos)
+                        else:
+                            if mpos != start :
+                                g.walls.append(mpos)
+                    if event.button == 1:
+                        if mpos in g.walls:
+                            break
+                        start = mpos
+                    if event.button == 3:
+                        goal = mpos
                     path, c = search_type(g, goal, start)
-                if event.key == pg.K_m:
-                    # dump the wall list for saving
-                    print([(int(loc.x), int(loc.y)) for loc in g.walls])
-            if event.type == pg.MOUSEBUTTONDOWN:
-                mpos = vec(pg.mouse.get_pos()) // TILESIZE
-                if event.button == 2:
-                    if mpos in g.walls:
-                        g.walls.remove(mpos)
-                    else:
-                        if mpos != start:
-                            g.walls.append(mpos)
-                if event.button == 1:
-                    if mpos in g.walls :
-                        break
-                    start = mpos
-                if event.button == 3:
-                    goal = mpos
-                path, c = search_type(g, goal, start)
 
-        # pg.display.set_caption("{:.2f}".format(clock.get_fps()))
-        pg.display.set_caption("Path Finder")
-        screen.fill(BLACK)
-        # fill explored area
-        for node in path:
-            x, y = node
-            rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-            pg.draw.rect(screen, MEDGRAY, rect)
-        draw_grid()
-        g.draw()
-        # draw path from start to goal
-        current = start # + path[vec2int(start)]
-        l = 0
-        while current != goal:
-            v = path[(current.x, current.y)]
-            if v.length_squared() == 1:
-                l += 10
-            else:
-                l += 14
-            img = arrows[vec2int(v)]
-            x = current.x * TILESIZE + TILESIZE / 2
-            y = current.y * TILESIZE + TILESIZE / 2
-            r = img.get_rect(center=(x, y))
-            screen.blit(img, r)
-            # find next in path
-            current = current + path[vec2int(current)]
-        draw_icons()
-        draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
-        draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
-        pg.display.flip()
-        #test
+            # pg.display.set_caption("{:.2f}".format(clock.get_fps()))
+            pg.display.set_caption("Path Finder")
+            screen.fill(BLACK)
+            # fill explored area
+            for node in path:
+                x, y = node
+                rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+                pg.draw.rect(screen, MEDGRAY, rect)
+            draw_grid()
+            g.draw()
+            # draw path from start to goal
+            current = start # + path[vec2int(start)]
+            l = 0
+            try:
+                while current != goal:
+                    if (current.x, current.y) in path:
+                        v = path[(current.x, current.y)]
+                    if v.length_squared() == 1:
+                        l += 10
+                    else:
+                        l += 14
+                    img = arrows[vec2int(v)]
+                    x = current.x * TILESIZE + TILESIZE / 2
+                    y = current.y * TILESIZE + TILESIZE / 2
+                    r = img.get_rect(center=(x, y))
+                    screen.blit(img, r)
+                    # find next in path
+                    current = current + path[vec2int(current)]
+            except :
+                pass
+            draw_icons()
+            draw_text(search_type.__name__, 30, WHITE, WIDTH - 10, HEIGHT - 10, screen, font_name, align="bottomright")
+            draw_text('Path length:{}'.format(l), 30, WHITE, WIDTH - 10, HEIGHT - 45, screen, font_name, align="bottomright")
+            pg.display.flip()
