@@ -90,6 +90,27 @@ def heuristic(a, b):
     # return abs(a.x - b.x) ** 2 + abs(a.y - b.y) ** 2
     return (abs(a.x - b.x) + abs(a.y - b.y)) * 10
 
+def breadth_first_search(graph, start, end):
+    frontier = PriorityQueue()
+    frontier.put(vec2int(start), 0)
+    path = {}
+    cost = {}
+    path[vec2int(start)] = None
+    cost[vec2int(start)] = 0
+
+    while not frontier.empty():
+        current = frontier.get()
+        if current == end:
+            break
+        for next in graph.find_neighbors(vec(current)):
+            next = vec2int(next)
+            next_cost = cost[current] + graph.cost(current, next)
+            if next not in cost or next_cost < cost[next]:
+                cost[next] = next_cost
+                frontier.put(next, cost)
+                path[next] = vec(current) - vec(next)
+    return path, cost
+
 def a_star_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
@@ -112,7 +133,7 @@ def a_star_search(graph, start, end):
                 path[next] = vec(current) - vec(next)
     return path, cost
 
-def dijkstra_search(graph, start, end):
+def greedy_best_first_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
     path = {}
@@ -141,7 +162,7 @@ if __name__ == '__main__':
     GRIDHEIGHT = 15
     WIDTH = TILESIZE * GRIDWIDTH
     HEIGHT = TILESIZE * GRIDHEIGHT
-    FPS = 144
+    FPS = 60
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
@@ -160,10 +181,10 @@ if __name__ == '__main__':
     font_name = pg.font.match_font('hack')
 
     icon_dir = path.join(path.dirname(__file__))
-    home_img = pg.image.load(path.join(icon_dir, 'goal.png')).convert_alpha()
+    home_img = pg.image.load(path.join(icon_dir, 'ball.png')).convert_alpha()
     home_img = pg.transform.scale(home_img, (50, 50))
     # home_img.fill((0, 255, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
-    cross_img = pg.image.load(path.join(icon_dir, 'ball.png'))
+    cross_img = pg.image.load(path.join(icon_dir, 'goal6.png'))
     cross_img = pg.transform.scale(cross_img, (50, 50))
     # cross_img.fill((255, 0, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
     arrows = {}
@@ -184,7 +205,7 @@ if __name__ == '__main__':
 
     goal = vec(14, 8)
     start = vec(20, 0)
-    search_type = dijkstra_search
+    search_type = a_star_search
     path, c = search_type(g, goal, start)
 
     running = True
@@ -196,11 +217,14 @@ if __name__ == '__main__':
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         running = False
-                    if event.key == pg.K_SPACE:
-                        if search_type == a_star_search:
-                            search_type = dijkstra_search
-                        else:
-                            search_type = a_star_search
+                    if event.key == pg.K_1:
+                        search_type = a_star_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_2:
+                        search_type = greedy_best_first_search
+                        path, c = search_type(g, goal, start)
+                    if event.key == pg.K_3:
+                        search_type = breadth_first_search
                         path, c = search_type(g, goal, start)
                     if event.key == pg.K_m:
                         # dump the wall list for saving
