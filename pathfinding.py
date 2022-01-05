@@ -79,9 +79,9 @@ def draw_grid():
 
 def draw_icons():
     start_center = (goal.x * TILESIZE + TILESIZE / 2, goal.y * TILESIZE + TILESIZE / 2)
-    screen.blit(home_img, home_img.get_rect(center=start_center))
+    screen.blit(ball_img, ball_img.get_rect(center=start_center))
     goal_center = (start.x * TILESIZE + TILESIZE / 2, start.y * TILESIZE + TILESIZE / 2)
-    screen.blit(cross_img, cross_img.get_rect(center=goal_center))
+    screen.blit(goal_img, goal_img.get_rect(center=goal_center))
 
 def vec2int(v):
     return (int(v.x), int(v.y))
@@ -181,14 +181,14 @@ if __name__ == '__main__':
     font_name = pg.font.match_font('hack')
 
     icon_dir = path.join(path.dirname(__file__))
-    home_img = pg.image.load(path.join(icon_dir, 'ball.png')).convert_alpha()
-    home_img = pg.transform.scale(home_img, (50, 50))
+    goal_img = pg.image.load(path.join(icon_dir, './Images/goal.png')).convert_alpha()
+    goal_img = pg.transform.scale(goal_img, (50, 50))
     # home_img.fill((0, 255, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
-    cross_img = pg.image.load(path.join(icon_dir, 'goal6.png'))
-    cross_img = pg.transform.scale(cross_img, (50, 50))
+    ball_img = pg.image.load(path.join(icon_dir, './Images/ball.png'))
+    ball_img = pg.transform.scale(ball_img, (50, 50))
     # cross_img.fill((255, 0, 0, 255), special_flags=pg.BLEND_RGBA_MULT)
     arrows = {}
-    arrow_img = pg.image.load(path.join(icon_dir, 'arrowRight.png')).convert_alpha()
+    arrow_img = pg.image.load(path.join(icon_dir, './Images/arrowLeft.png')).convert_alpha()
     arrow_img = pg.transform.scale(arrow_img, (50, 50))
     for dir in [(1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
         arrows[dir] = pg.transform.rotate(arrow_img, vec(dir).angle_to(vec(1, 0)))
