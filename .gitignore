@@ -5,3 +5,5 @@ __pycache__/settings.cpython-39.pyc
 __pycache__/sprites.cpython-39.pyc
 .idea
 /.idea
+/.DS_Store
+/venv
