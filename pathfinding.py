@@ -93,11 +93,8 @@ def heuristic(a, b):
 def breadth_first_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
-    path = {}
-    cost = {}
-    path[vec2int(start)] = None
-    cost[vec2int(start)] = 0
-
+    path = {vec2int(start): None}
+    cost = {vec2int(start): 0}
     while not frontier.empty():
         current = frontier.get()
         if current == end:
@@ -114,11 +111,8 @@ def breadth_first_search(graph, start, end):
 def a_star_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
-    path = {}
-    cost = {}
-    path[vec2int(start)] = None
-    cost[vec2int(start)] = 0
-
+    path = {vec2int(start): None}
+    cost = {vec2int(start): 0}
     while not frontier.empty():
         current = frontier.get()
         if current == end:
@@ -136,11 +130,8 @@ def a_star_search(graph, start, end):
 def greedy_best_first_search(graph, start, end):
     frontier = PriorityQueue()
     frontier.put(vec2int(start), 0)
-    path = {}
-    cost = {}
-    path[vec2int(start)] = None
-    cost[vec2int(start)] = 0
-
+    path = {vec2int(start): None}
+    cost = {vec2int(start): 0}
     while not frontier.empty():
         current = frontier.get()
         if current == end:

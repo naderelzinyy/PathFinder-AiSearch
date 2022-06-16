@@ -21,9 +21,7 @@ class Game:
     def load_data(self):
         self.map_data = []
         with open(path.join(path.dirname(__file__), './Maps/map3.txt'), 'rt') as f:
-            for line in f:
-                self.map_data.append(line)
-
+            self.map_data.extend(iter(f))
         # load arrow sprites
         icon_dir = path.join(path.dirname(__file__))
         self.arrows = {}
@@ -45,11 +43,11 @@ class Game:
                 if tile == '1':
                     Wall(self, col, row)
                     self.walls_list.append((col, row))
-                if tile == 'P':
-                    self.player = Player(self, col, row)
-                if tile == 'M':
+                elif tile == 'M':
                     mob_pos.append((col, row))
 
+                elif tile == 'P':
+                    self.player = Player(self, col, row)
         self.g = WeightedGrid(GRIDWIDTH, GRIDHEIGHT)
         for wall in self.walls_list:
             self.g.walls.append(vec(wall))
@@ -99,10 +97,7 @@ class Game:
         path_len = 0
         while current != goal:
             v = path[(current.x, current.y)]
-            if v.length_squared() == 1:
-                path_len += 10
-            else:
-                path_len += 14
+            path_len += 10 if v.length_squared() == 1 else 14
             img = self.arrows[vec2int(v)]
             x = current.x * TILESIZE + TILESIZE / 2
             y = current.y * TILESIZE + TILESIZE / 2
@@ -132,9 +127,8 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    self.quit()
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.quit()
 
 
 
