@@ -9,8 +9,9 @@ def collide_rect(one, two):  # one -> player ; two -> wall
 
 def collide_with_walls(sprite, sprite_group, direction):
     if direction == 'x':
-        hits = pg.sprite.spritecollide(sprite, sprite_group, False, collide_rect)
-        if hits:
+        if hits := pg.sprite.spritecollide(
+            sprite, sprite_group, False, collide_rect
+        ):
             if hits[0].rect.centerx > sprite.rect.centerx:
                 # if moves to the right
                 sprite.pos.x = hits[0].rect.left - sprite.rect.width / 2
@@ -20,8 +21,9 @@ def collide_with_walls(sprite, sprite_group, direction):
             sprite.vel.x = 0
             sprite.rect.centerx = sprite.pos.x
     if direction == 'y':
-        hits = pg.sprite.spritecollide(sprite, sprite_group, False, collide_rect)
-        if hits:
+        if hits := pg.sprite.spritecollide(
+            sprite, sprite_group, False, collide_rect
+        ):
             if hits[0].rect.centery > sprite.rect.centery:
                 sprite.pos.y = hits[0].rect.top - sprite.rect.height / 2
             if hits[0].rect.centery < sprite.rect.centery:
@@ -59,8 +61,7 @@ class Player(pg.sprite.Sprite):
 
     def collide_with_walls(self, dir):
         if dir == 'x':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
+            if hits := pg.sprite.spritecollide(self, self.game.walls, False):
                 if self.vx > 0:
                     self.x = hits[0].rect.left - self.rect.width
                 if self.vx < 0:
@@ -68,8 +69,7 @@ class Player(pg.sprite.Sprite):
                 self.vx = 0
                 self.rect.x = self.x
         if dir == 'y':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
+            if hits := pg.sprite.spritecollide(self, self.game.walls, False):
                 if self.vy > 0:
                     self.y = hits[0].rect.top - self.rect.height
                 if self.vy < 0:
@@ -117,8 +117,7 @@ class IA(pg.sprite.Sprite):
         The new position of the sprite becomes the next tile in the path.
         Use and update self.x and self.y
          """
-        direction = self.path[self.get_tile()]
-        if direction:  # if direction != None
+        if direction := self.path[self.get_tile()]:
             self.x += (direction.x * TILESIZE)
             self.y += (direction.y * TILESIZE)
         self.rect.x = self.x
@@ -131,8 +130,7 @@ class IA(pg.sprite.Sprite):
         Is more efficient if the size of the sprite rect is less than TILESIZE.
         """
         self.vel = vec(0, 0)
-        direction = self.path[self.get_tile()]
-        if direction:  # if direction != None
+        if direction := self.path[self.get_tile()]:
             speed = 230
             next_tile = vec(self.get_tile()) + direction
             # target : center of the next tile
